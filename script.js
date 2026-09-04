@@ -1,4 +1,4 @@
-﻿// ============================================================
+// ============================================================
 // GUARANTEED PRELOADER INITIALIZATION & SAFETY FALLBACK
 // ============================================================
 (function() {
@@ -12,34 +12,31 @@
             preloader.classList.add('preloader-fade-out');
             setTimeout(() => {
                 preloader.style.display = 'none';
-            }, 900);
+            }, 500);
         }
         document.body.classList.remove('no-scroll');
-
-        // Trigger promo modal if present
-        const promoModal = document.getElementById('promo-modal');
-        if (promoModal && typeof openPromoModal === 'function') {
-            setTimeout(openPromoModal, 300);
-        }
     }
 
     if (document.readyState === 'complete' || document.readyState === 'interactive') {
-        setTimeout(dismissPreloader, 800);
+        setTimeout(dismissPreloader, 400);
     } else {
-        window.addEventListener('DOMContentLoaded', () => setTimeout(dismissPreloader, 800));
-        window.addEventListener('load', () => setTimeout(dismissPreloader, 800));
+        window.addEventListener('DOMContentLoaded', () => setTimeout(dismissPreloader, 400));
+        window.addEventListener('load', () => setTimeout(dismissPreloader, 400));
     }
     
-    // Hard fallback timeout (maximum 2.5 seconds)
-    setTimeout(dismissPreloader, 2500);
+    // Hard fallback timeout (maximum 1.5 seconds)
+    setTimeout(dismissPreloader, 1500);
 })();
+
 // Navbar Scroll Effect
 window.addEventListener('scroll', () => {
     const navbar = document.querySelector('.navbar');
-    if (window.scrollY > 50) {
-        navbar.classList.add('navbar-scrolled');
-    } else {
-        navbar.classList.remove('navbar-scrolled');
+    if (navbar) {
+        if (window.scrollY > 50) {
+            navbar.classList.add('navbar-scrolled');
+        } else {
+            navbar.classList.remove('navbar-scrolled');
+        }
     }
 });
 
@@ -49,8 +46,8 @@ const navLinks = document.querySelector('.nav-links');
 
 if (hamburger && navLinks) {
     hamburger.addEventListener('click', (e) => {
-    e.stopPropagation(); // Prevent document click handler from firing immediately
-    navLinks.classList.toggle('nav-active');
+        e.stopPropagation();
+        navLinks.classList.toggle('nav-active');
     });
 }
 
@@ -81,7 +78,7 @@ window.addEventListener('scroll', () => {
 });
 
 // Reveal Elements on Scroll
-const revealElements = document.querySelectorAll('.reviews-slider-container, .vibe-text, .contact-container');
+const revealElements = document.querySelectorAll('.reviews-slider-container, .vibe-text, .contact-container, .main-menu-section');
 
 const revealOnScroll = () => {
     const windowHeight = window.innerHeight;
@@ -101,10 +98,9 @@ const revealOnScroll = () => {
 };
 
 window.addEventListener('scroll', revealOnScroll);
-// Trigger once on load
 revealOnScroll();
 
-// Banner Image Slider (Fade and Scale Effect with Hover Preview & Side Click Zones)
+// Banner Image Slider
 const bannerImages = document.querySelectorAll('.hero-bg img');
 const leftZone = document.querySelector('.hero-nav-zone.left-zone');
 const rightZone = document.querySelector('.hero-nav-zone.right-zone');
@@ -147,7 +143,7 @@ function rotateBanner() {
 function startBannerTimer() {
     stopBannerTimer();
     if (bannerImages.length > 1) {
-        bannerInterval = setInterval(rotateBanner, 5000); // Change image every 5 seconds
+        bannerInterval = setInterval(rotateBanner, 5000);
     }
 }
 
@@ -157,19 +153,17 @@ function stopBannerTimer() {
     }
 }
 
-// Initialize banner
 if (bannerImages.length > 0) {
     transitionToBannerImage(0);
     startBannerTimer();
 }
 
-// Add event listeners for navigation zones
 if (leftZone && bannerImages.length > 1) {
     leftZone.addEventListener('click', () => {
         const prevIndex = (currentImageIndex - 1 + bannerImages.length) % bannerImages.length;
         currentImageIndex = prevIndex;
         transitionToBannerImage(currentImageIndex);
-        startBannerTimer(); // reset auto-slide timer on manual click
+        startBannerTimer();
     });
 }
 
@@ -178,7 +172,7 @@ if (rightZone && bannerImages.length > 1) {
         const nextIndex = (currentImageIndex + 1) % bannerImages.length;
         currentImageIndex = nextIndex;
         transitionToBannerImage(currentImageIndex);
-        startBannerTimer(); // reset auto-slide timer on manual click
+        startBannerTimer();
     });
 }
 
@@ -193,7 +187,6 @@ let reviewInterval;
 function showReview(index) {
     if (reviewItems.length === 0) return;
     
-    // Wrap around index
     if (index >= reviewItems.length) {
         currentReviewIndex = 0;
     } else if (index < 0) {
@@ -202,7 +195,6 @@ function showReview(index) {
         currentReviewIndex = index;
     }
     
-    // Update active classes for reviews
     reviewItems.forEach((item, i) => {
         if (i === currentReviewIndex) {
             item.classList.add('active');
@@ -211,7 +203,6 @@ function showReview(index) {
         }
     });
     
-    // Update active classes for dots
     reviewDots.forEach((dot, i) => {
         if (i === currentReviewIndex) {
             dot.classList.add('active');
@@ -223,9 +214,11 @@ function showReview(index) {
 
 function startReviewTimer() {
     stopReviewTimer();
-    reviewInterval = setInterval(() => {
-        showReview(currentReviewIndex + 1);
-    }, 5000); // changes review every 5 seconds
+    if (reviewItems.length > 1) {
+        reviewInterval = setInterval(() => {
+            showReview(currentReviewIndex + 1);
+        }, 5000);
+    }
 }
 
 function stopReviewTimer() {
@@ -234,18 +227,17 @@ function stopReviewTimer() {
     }
 }
 
-// Event Listeners for controls
 if (nextBtn) {
     nextBtn.addEventListener('click', () => {
         showReview(currentReviewIndex + 1);
-        startReviewTimer(); // reset timer on manual click
+        startReviewTimer();
     });
 }
 
 if (prevBtn) {
     prevBtn.addEventListener('click', () => {
         showReview(currentReviewIndex - 1);
-        startReviewTimer(); // reset timer on manual click
+        startReviewTimer();
     });
 }
 
@@ -254,267 +246,24 @@ if (reviewDots) {
         dot.addEventListener('click', (e) => {
             const index = parseInt(e.target.getAttribute('data-index'));
             showReview(index);
-            startReviewTimer(); // reset timer on manual click
+            startReviewTimer();
         });
     });
 }
 
-// Initialize reviews slider
 if (reviewItems.length > 0) {
     showReview(0);
     startReviewTimer();
 }
 
-// Preloader Screen Logic (Fades out after 1 second and reveals Promo Poster if present)
-function initPreloader() {
-    const preloader = document.getElementById('preloader');
-    if (preloader) {
-        setTimeout(() => {
-            preloader.classList.add('preloader-fade-out');
-            
-            // Show Promo Modal after preloader fades out
-            const promoModal = document.getElementById('promo-modal');
-            if (promoModal) {
-                setTimeout(openPromoModal, 300);
-            } else {
-                document.body.classList.remove('no-scroll'); // Re-enable vertical scrolling if no promo modal
-            }
-        }, 1000); // 1 second duration
-    }
-}
-
-if (document.readyState === 'loading') {
-    window.addEventListener('DOMContentLoaded', initPreloader);
-} else {
-    initPreloader();
-}
-
-// Rath Yatra Hotel Feast Click-to-Activate Animation
-const templeBell = document.getElementById('temple-bell');
-const rathAltar = document.getElementById('rath-feast-altar');
-if (templeBell && rathAltar) {
-    templeBell.addEventListener('click', () => {
-        if (!rathAltar.classList.contains('activated')) {
-            rathAltar.classList.add('activated');
-            
-            // Reset animations after 2.5 seconds
-            setTimeout(() => {
-                rathAltar.classList.remove('activated');
-            }, 2500);
-        }
-    });
-}
-
-// ============================================================
-// SLIDE-OUT MESSAGE PANEL LOGIC
-// ============================================================
-// Message Panel Logic
-const closeMsgPanelBtn = document.getElementById('close-msg-panel-btn');
-const msgPanel = document.getElementById('msg-panel');
-const msgPanelOverlay = document.getElementById('msg-panel-overlay');
-const msgPanelForm = document.getElementById('msg-panel-form');
-const submitMsgBtn = document.getElementById('submit-msg-btn');
-const msgStatusContainer = document.getElementById('msg-status-container');
-const openMsgPanelDirectBtn = document.getElementById('open-msg-panel-direct-btn');
-
-// Google Sheet Web App URL provided by user
-const GOOGLE_SHEET_URL = "https://script.google.com/macros/s/AKfycbwFRBfgECv4kyCOJCrjDmpbWn4oIkiCJOpGndOI_d3SCzTtWGuG14uJZ2xGtUIDEsL8/exec";
-
-function openMessagePanel() {
-    if (msgPanel && msgPanelOverlay) {
-        msgPanel.classList.add('active');
-        msgPanelOverlay.classList.add('active');
-        document.body.classList.add('no-scroll'); // Disable page scrolling
-    }
-}
-
-function closeMessagePanel() {
-    if (msgPanel && msgPanelOverlay) {
-        msgPanel.classList.remove('active');
-        msgPanelOverlay.classList.remove('active');
-        document.body.classList.remove('no-scroll'); // Restore page scrolling
-        // Reset status message
-        if (msgStatusContainer) {
-            msgStatusContainer.style.display = 'none';
-            msgStatusContainer.className = 'msg-status-container';
-        }
-    }
-}
-
-if (openMsgPanelDirectBtn) {
-    openMsgPanelDirectBtn.addEventListener('click', openMessagePanel);
-}
-
-if (closeMsgPanelBtn) {
-    closeMsgPanelBtn.addEventListener('click', closeMessagePanel);
-}
-
-if (msgPanelOverlay) {
-    msgPanelOverlay.addEventListener('click', closeMessagePanel);
-}
-
-// Handle Form Submission
-if (msgPanelForm) {
-    msgPanelForm.addEventListener('submit', (e) => {
-        e.preventDefault();
-
-        const nameInput = document.getElementById('msg-name');
-        const emailInput = document.getElementById('msg-email');
-        const contentInput = document.getElementById('msg-content');
-
-        if (!nameInput || !emailInput || !contentInput) return;
-
-        const payload = {
-            name: nameInput.value.trim(),
-            email: emailInput.value.trim(),
-            message: contentInput.value.trim()
-        };
-
-        // Disable button and show loading state
-        submitMsgBtn.disabled = true;
-        const originalBtnContent = submitMsgBtn.innerHTML;
-        submitMsgBtn.innerHTML = '<div class="btn-loader"></div> Sending...';
-
-        // Hide previous status
-        if (msgStatusContainer) {
-            msgStatusContainer.style.display = 'none';
-        }
-
-        // Send post request to Google Sheets script
-        fetch(GOOGLE_SHEET_URL, {
-            method: 'POST',
-            mode: 'cors',
-            headers: {
-                'Content-Type': 'text/plain;charset=utf-8' // Apps Script handles text/plain without triggering CORS preflight options blocks in some environments
-            },
-            body: JSON.stringify(payload)
-        })
-        .then(response => {
-            // Apps script returns 200 or redirect
-            submitMsgBtn.innerHTML = originalBtnContent;
-            submitMsgBtn.disabled = false;
-            
-            if (msgStatusContainer) {
-                msgStatusContainer.textContent = "Your message was sent successfully! Thank you.";
-                msgStatusContainer.className = "msg-status-container success";
-            }
-            
-            // Clear inputs
-            msgPanelForm.reset();
-            
-            // Auto close after 3 seconds
-            setTimeout(closeMessagePanel, 3000);
-        })
-        .catch((error) => {
-            // Error response
-            submitMsgBtn.innerHTML = originalBtnContent;
-            submitMsgBtn.disabled = false;
-            
-            if (msgStatusContainer) {
-                msgStatusContainer.textContent = "Something went wrong. Please try again.";
-                msgStatusContainer.className = "msg-status-container error";
-            }
-            console.error("Error submitting contact form:", error);
-        });
-    });
-}
-
-// ============================================================
-// PROMOTIONAL POSTER MODAL LOGIC
-// ============================================================
-const promoModal = document.getElementById('promo-modal');
-const closePromoModalBtn = document.getElementById('close-promo-modal-btn');
-const promoModalOverlay = document.querySelector('.promo-modal-overlay');
-const promoModalContent = document.querySelector('.promo-modal-content');
-const openPromoModalDirectBtn = document.getElementById('open-promo-modal-direct-btn');
-let promoAutoCloseTimer = null;
-
-function closePromoModal() {
-    if (promoAutoCloseTimer) {
-        clearTimeout(promoAutoCloseTimer);
-        promoAutoCloseTimer = null;
-    }
-    if (promoModal && promoModalContent) {
-        const button = document.getElementById('open-promo-modal-direct-btn');
-        if (button) {
-            const buttonRect = button.getBoundingClientRect();
-            const contentRect = promoModalContent.getBoundingClientRect();
-
-            // Calculate exact center coordinates difference
-            const dx = (buttonRect.left + buttonRect.width / 2) - (contentRect.left + contentRect.width / 2);
-            const dy = (buttonRect.top + buttonRect.height / 2) - (contentRect.top + contentRect.height / 2);
-
-            // Apply to CSS variables
-            promoModalContent.style.setProperty('--fly-x', `${dx}px`);
-            promoModalContent.style.setProperty('--fly-y', `${dy}px`);
-        }
-
-        // Add closing state to trigger scale and translation
-        promoModal.classList.add('closing');
-        document.body.classList.remove('no-scroll'); // Restore scrolling
-
-        setTimeout(() => {
-            promoModal.classList.remove('active', 'closing');
-            promoModalContent.style.removeProperty('--fly-x');
-            promoModalContent.style.removeProperty('--fly-y');
-        }, 650); // 650ms match with CSS keyframe animation duration
-    } else if (promoModal) {
-        promoModal.classList.remove('active');
-        document.body.classList.remove('no-scroll');
-    }
-}
-
-function openPromoModal() {
-    if (promoModal) {
-        if (promoAutoCloseTimer) {
-            clearTimeout(promoAutoCloseTimer);
-        }
-        promoModal.classList.remove('closing');
-        if (promoModalContent) {
-            promoModalContent.style.removeProperty('--fly-x');
-            promoModalContent.style.removeProperty('--fly-y');
-        }
-        promoModal.classList.add('active');
-        document.body.classList.add('no-scroll'); // Lock scrolling
-
-        // Automatically close the promo poster modal after 6 seconds (6000ms)
-        promoAutoCloseTimer = setTimeout(() => {
-            closePromoModal();
-        }, 6000);
-    }
-}
-
-if (openPromoModalDirectBtn) {
-    openPromoModalDirectBtn.addEventListener('click', openPromoModal);
-}
-
-if (closePromoModalBtn) {
-    closePromoModalBtn.addEventListener('click', closePromoModal);
-}
-
-if (promoModalOverlay) {
-    promoModalOverlay.addEventListener('click', closePromoModal);
-}
-
-// ============================================================
-
 // ============================================================
 // MAIN RESTAURANT MENU HORIZONTAL SCROLL & CATEGORY FILTER
 // ============================================================
 const mainRestaurantMenuScroll = document.getElementById('main-restaurant-menu-scroll');
-const inPageMenuTabs = document.querySelectorAll('.menu-category-tabs .menu-tab-btn');
-const inPageFoodCards = document.querySelectorAll('#main-restaurant-menu-scroll .food-menu-card');
+const inPageMenuTabs = document.querySelectorAll('.main-menu-section .menu-category-tabs .menu-tab-btn, .menu-tab-btn');
+const inPageFoodCards = document.querySelectorAll('#main-restaurant-menu-scroll .food-menu-card, .main-menu-section .food-menu-card');
 
 if (mainRestaurantMenuScroll) {
-    // Normal mouse wheel horizontal scroll
-    mainRestaurantMenuScroll.addEventListener('wheel', (e) => {
-        if (e.deltaY !== 0) {
-            e.preventDefault();
-            mainRestaurantMenuScroll.scrollLeft += e.deltaY;
-        }
-    }, { passive: false });
-
-    // Mouse Drag to Scroll
     let isMouseDownMain = false;
     let startXMain = 0;
     let scrollLeftMain = 0;
@@ -542,22 +291,34 @@ if (mainRestaurantMenuScroll) {
     });
 }
 
-if (inPageMenuTabs.length > 0 && inPageFoodCards.length > 0) {
+if (inPageMenuTabs.length > 0) {
     inPageMenuTabs.forEach(tab => {
         tab.addEventListener('click', () => {
-            inPageMenuTabs.forEach(t => t.classList.remove('active'));
+            const tabsContainer = tab.closest('.menu-category-tabs');
+            if (tabsContainer) {
+                const siblingTabs = tabsContainer.querySelectorAll('.menu-tab-btn');
+                siblingTabs.forEach(t => t.classList.remove('active'));
+            }
             tab.classList.add('active');
 
             const selectedCategory = tab.getAttribute('data-category');
 
-            inPageFoodCards.forEach(card => {
-                const cardCategory = card.getAttribute('data-category');
-                if (selectedCategory === 'all' || cardCategory === selectedCategory) {
-                    card.classList.remove('hidden');
-                } else {
-                    card.classList.add('hidden');
-                }
-            });
+            if (inPageFoodCards.length > 0) {
+                inPageFoodCards.forEach(card => {
+                    const cardCategory = card.getAttribute('data-category');
+                    if (selectedCategory === 'all' || cardCategory === selectedCategory) {
+                        card.classList.remove('hidden');
+                    } else {
+                        card.classList.add('hidden');
+                    }
+                });
+            }
+
+            // Smoothly center clicked tab inside single line tabs container to bring next options into view
+            if (tabsContainer) {
+                const targetScroll = tab.offsetLeft - (tabsContainer.clientWidth / 2) + (tab.offsetWidth / 2);
+                tabsContainer.scrollTo({ left: targetScroll, behavior: 'smooth' });
+            }
 
             // Smoothly reset track to beginning when category is clicked
             if (mainRestaurantMenuScroll) {
@@ -567,6 +328,100 @@ if (inPageMenuTabs.length > 0 && inPageFoodCards.length > 0) {
     });
 }
 
+// ============================================================
+// SLIDE-OUT MESSAGE PANEL LOGIC
+// ============================================================
+const closeMsgPanelBtn = document.getElementById('close-msg-panel-btn');
+const msgPanel = document.getElementById('msg-panel');
+const msgPanelOverlay = document.getElementById('msg-panel-overlay');
+const msgPanelForm = document.getElementById('msg-panel-form');
+const submitMsgBtn = document.getElementById('submit-msg-btn');
+const msgStatusContainer = document.getElementById('msg-status-container');
+const openMsgPanelDirectBtn = document.getElementById('open-msg-panel-direct-btn');
+
+const GOOGLE_SHEET_URL = "https://script.google.com/macros/s/AKfycbwFRBfgECv4kyCOJCrjDmpbWn4oIkiCJOpGndOI_d3SCzTtWGuG14uJZ2xGtUIDEsL8/exec";
+
+function openMessagePanel() {
+    if (msgPanel && msgPanelOverlay) {
+        msgPanel.classList.add('active');
+        msgPanelOverlay.classList.add('active');
+        document.body.classList.add('no-scroll');
+    }
+}
+
+function closeMessagePanel() {
+    if (msgPanel && msgPanelOverlay) {
+        msgPanel.classList.remove('active');
+        msgPanelOverlay.classList.remove('active');
+        document.body.classList.remove('no-scroll');
+        if (msgStatusContainer) {
+            msgStatusContainer.style.display = 'none';
+            msgStatusContainer.className = 'msg-status-container';
+        }
+    }
+}
+
+if (openMsgPanelDirectBtn) {
+    openMsgPanelDirectBtn.addEventListener('click', openMessagePanel);
+}
+
+if (closeMsgPanelBtn) {
+    closeMsgPanelBtn.addEventListener('click', closeMessagePanel);
+}
+
+if (msgPanelOverlay) {
+    msgPanelOverlay.addEventListener('click', closeMessagePanel);
+}
+
+if (msgPanelForm) {
+    msgPanelForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const name = document.getElementById('msg-name').value.trim();
+        const email = document.getElementById('msg-email').value.trim();
+        const content = document.getElementById('msg-content').value.trim();
+        
+        if (!name || !email || !content) return;
+        
+        if (submitMsgBtn) {
+            submitMsgBtn.disabled = true;
+            submitMsgBtn.innerHTML = '<span>Sending...</span> <i class="fas fa-spinner fa-spin"></i>';
+        }
+        
+        try {
+            const formData = new URLSearchParams();
+            formData.append('Name', name);
+            formData.append('Email_or_Phone', email);
+            formData.append('Message', content);
+            
+            await fetch(GOOGLE_SHEET_URL, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: formData.toString()
+            });
+            
+            if (msgStatusContainer) {
+                msgStatusContainer.style.display = 'block';
+                msgStatusContainer.className = 'msg-status-container status-success';
+                msgStatusContainer.innerHTML = '<i class="fas fa-check-circle"></i> Message sent successfully!';
+            }
+            msgPanelForm.reset();
+            setTimeout(closeMessagePanel, 2000);
+        } catch (error) {
+            if (msgStatusContainer) {
+                msgStatusContainer.style.display = 'block';
+                msgStatusContainer.className = 'msg-status-container status-error';
+                msgStatusContainer.innerHTML = '<i class="fas fa-exclamation-circle"></i> Error sending message. Please try again.';
+            }
+        } finally {
+            if (submitMsgBtn) {
+                submitMsgBtn.disabled = false;
+                submitMsgBtn.innerHTML = '<span>Send Message</span> <i class="fas fa-paper-plane"></i>';
+            }
+        }
+    });
+}
 
 // ============================================================
 // IN-PAGE FULL MENU POPUP MODAL LOGIC
@@ -577,8 +432,8 @@ const closeFullMenuModalBtn = document.getElementById('close-full-menu-modal-btn
 const closeFullMenuIconBtn = document.getElementById('close-full-menu-icon-btn');
 const fullMenuModalOverlay = document.getElementById('full-menu-modal-overlay');
 const modalMenuSearchInput = document.getElementById('modal-menu-search-input');
-const modalCategoryTabs = document.querySelectorAll('#modal-menu-category-tabs .menu-tab-btn');
-const modalFoodCards = document.querySelectorAll('#modal-full-menu-grid .food-menu-card');
+const modalCategoryTabs = document.querySelectorAll('#modal-menu-category-tabs .menu-tab-btn, .full-menu-modal .menu-tab-btn');
+const modalFoodCards = document.querySelectorAll('#modal-full-menu-grid .food-menu-card, .full-menu-modal .food-menu-card');
 const modalNoResultsMsg = document.getElementById('modal-no-results-msg');
 const modalTimingBtn = document.getElementById('modal-timing-btn');
 const modalOrderTimingsSection = document.getElementById('modal-order-timings');
@@ -594,7 +449,8 @@ function filterModalMenu() {
         const cardCategory = card.getAttribute('data-category');
         const keywords = (card.getAttribute('data-keywords') || '') + ' ' + card.innerText.toLowerCase();
 
-        const matchesCategory = (modalActiveCategory === 'all' || cardCategory === modalActiveCategory);
+        // When searching, show matching items regardless of whichever category filter is currently active
+        const matchesCategory = (query !== '' || modalActiveCategory === 'all' || cardCategory === modalActiveCategory);
         const matchesSearch = query === '' || keywords.includes(query);
 
         if (matchesCategory && matchesSearch) {
@@ -616,7 +472,6 @@ function openFullMenuModal() {
         fullMenuModal.setAttribute('aria-hidden', 'false');
         document.body.classList.add('no-scroll');
 
-        // Reset filter
         modalActiveCategory = 'all';
         if (modalCategoryTabs) {
             modalCategoryTabs.forEach(t => {
@@ -639,10 +494,8 @@ function closeFullMenuModal() {
         fullMenuModal.classList.remove('active');
         fullMenuModal.setAttribute('aria-hidden', 'true');
         
-        // Only remove no-scroll if promo modal and message panel are not active
-        const promoActive = promoModal && promoModal.classList.contains('active');
-        const msgActive = document.getElementById('msg-panel') && document.getElementById('msg-panel').classList.contains('active');
-        if (!promoActive && !msgActive) {
+        const msgActive = msgPanel && msgPanel.classList.contains('active');
+        if (!msgActive) {
             document.body.classList.remove('no-scroll');
         }
     }
@@ -664,21 +517,50 @@ if (fullMenuModalOverlay) {
     fullMenuModalOverlay.addEventListener('click', closeFullMenuModal);
 }
 
-// Category filter tabs inside modal
 if (modalCategoryTabs.length > 0) {
     modalCategoryTabs.forEach(tab => {
         tab.addEventListener('click', () => {
             modalCategoryTabs.forEach(t => t.classList.remove('active'));
             tab.classList.add('active');
             modalActiveCategory = tab.getAttribute('data-category');
+            
+            // Clear search input on tab selection so category items are clearly displayed
+            if (modalMenuSearchInput && modalMenuSearchInput.value.trim() !== '') {
+                modalMenuSearchInput.value = '';
+            }
+            
+            const modalTabsContainer = tab.closest('.menu-category-tabs');
+            if (modalTabsContainer) {
+                const targetScroll = tab.offsetLeft - (modalTabsContainer.clientWidth / 2) + (tab.offsetWidth / 2);
+                modalTabsContainer.scrollTo({ left: targetScroll, behavior: 'smooth' });
+            }
             filterModalMenu();
         });
     });
 }
 
-// Live search inside modal
 if (modalMenuSearchInput) {
-    modalMenuSearchInput.addEventListener('input', filterModalMenu);
+    modalMenuSearchInput.addEventListener('input', () => {
+        const query = modalMenuSearchInput.value.toLowerCase().trim();
+        // If searching with a query while on a specific filter tab, switch tab to 'all' so UI reflects all matching items
+        if (query !== '' && modalActiveCategory !== 'all') {
+            modalActiveCategory = 'all';
+            if (modalCategoryTabs) {
+                modalCategoryTabs.forEach(t => {
+                    if (t.getAttribute('data-category') === 'all') {
+                        t.classList.add('active');
+                        const modalTabsContainer = t.closest('.menu-category-tabs');
+                        if (modalTabsContainer) {
+                            modalTabsContainer.scrollTo({ left: 0, behavior: 'smooth' });
+                        }
+                    } else {
+                        t.classList.remove('active');
+                    }
+                });
+            }
+        }
+        filterModalMenu();
+    });
 }
 
 // Two-Way Scroll for Modal Timings Button (Down to Timings / Up to Top)
